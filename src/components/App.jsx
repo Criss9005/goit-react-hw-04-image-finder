@@ -26,13 +26,13 @@ export default function App() {
         setImages(data)
         setTotalPages(Math.ceil(response.data.totalHits/12))
       })
-      .catch(err => { 
-        setErr(err)
+      .catch(e => { 
+        setErr(e)
         console.log(err)
       })
     
   
-  }, [search, perPage])
+  }, [search, perPage, err])
 
   useEffect(() => { 
  axios.get(`https://pixabay.com/api/?q=${search}&page=1&key=40957682-dd6a267c102109d1db4973f80&image_type=photo&orientation=horizontal&per_page=${perPage}`)
