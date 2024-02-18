@@ -32,7 +32,7 @@ export default function App() {
       })
     
   
-  }, [search, perPage])
+  }, [])
 
   useEffect(() => { 
  axios.get(`https://pixabay.com/api/?q=${search}&page=1&key=40957682-dd6a267c102109d1db4973f80&image_type=photo&orientation=horizontal&per_page=${perPage}`)
