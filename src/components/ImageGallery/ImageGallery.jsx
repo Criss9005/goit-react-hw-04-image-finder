@@ -1,7 +1,7 @@
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem'
 import styles from './ImageGallery.module.css'
 
-const ImageGallery = ({ images, ImgClick}) => { 
+export default function ImageGallery({ images, ImgClick}) {
   return (
     <ul className={ styles.ImageGallery}>
       {images.map(image =>{ 
@@ -10,6 +10,3 @@ const ImageGallery = ({ images, ImgClick}) => {
     </ul>
   )
 }
-
-export default ImageGallery
-

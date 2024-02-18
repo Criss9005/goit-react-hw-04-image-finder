@@ -4,116 +4,110 @@ import Button from "./Button/Button";
 import Modal from "./Modal/Modal";
 import axios from "axios";
 import { Audio } from 'react-loader-spinner'
+import React, { useEffect, useState } from 'react'
 
+export default function App() {
 
-import React, { Component } from 'react'
+  const [images, setImages] = useState([])
+  const [err, setErr] = useState(null)
+  const [isLoading, setIsloading] = useState(false)
+  const [search, setSearch] = useState('')
+  const [perPage, setperPage] = useState(12)
+  const [totalPages, setTotalPages] = useState(0)
+  const [page, setPage] = useState(1)
+  const [showModal, setShowModal] = useState(false)
+  const [imgModal, setImgModal] = useState('')
 
-export default class App extends Component {
-
-
-  state = {
-    images: [],
-    err: null,
-    isLoading: false,
-    search: '',
-    perPage: 12,
-    totalPages: 0,
-    page: 1,
-    showModal: false,
-    imgModal:''
-  }
-
-   handleSearch = (e) => { 
-     e.preventDefault()
-     if (this.state.search !== e.target.form[1].value) { 
-       this.setState({ isLoading:true })
-     }
-     this.setState({ search: e.target.form[1].value, perPage: 12, page:1})
-     console.log(this.state.images)
-      
-  }
-
-  componentDidMount() { 
-    
-    axios.get(`https://pixabay.com/api/?q=${this.state.search}&page=1&key=40957682-dd6a267c102109d1db4973f80&image_type=photo&orientation=horizontal&per_page=${this.state.perPage}`)
+  useEffect(() => { 
+       
+    axios.get(`https://pixabay.com/api/?q=${search}&page=1&key=40957682-dd6a267c102109d1db4973f80&image_type=photo&orientation=horizontal&per_page=${perPage}`)
       .then(response => {
         const data = response.data.hits
-        this.setState({images: data, totalPages: Math.ceil(response.data.totalHits/12) })
-        
+        setImages(data)
+        setTotalPages(Math.ceil(response.data.totalHits/12))
       })
       .catch(err => { 
-        this.setState({err: err})
+        setErr(err)
         console.log(err)
       })
     
-  }
-
   
-  componentDidUpdate() { 
+  }, [search, perPage])
 
-       axios.get(`https://pixabay.com/api/?q=${this.state.search}&page=1&key=40957682-dd6a267c102109d1db4973f80&image_type=photo&orientation=horizontal&per_page=${this.state.perPage}`)
+  useEffect(() => { 
+ axios.get(`https://pixabay.com/api/?q=${search}&page=1&key=40957682-dd6a267c102109d1db4973f80&image_type=photo&orientation=horizontal&per_page=${perPage}`)
         .then(response => {
           const data = response.data.hits
                     
-          if (JSON.stringify(this.state.images) !== JSON.stringify(data)) { 
+          if (JSON.stringify(images) !== JSON.stringify(data)) { 
             console.log('diferente')
-            this.setState({ images: data, totalPages: Math.ceil(response.data.totalHits / 12), isLoading:false})
-            
+            setImages(data)
+            setTotalPages(Math.ceil(response.data.totalHits / 12))
+            setIsloading(false)
+                        
           }
         })
         .catch(err => { 
-          this.setState({err: err})
+          setErr(err)
           
         })
-        
+  },[images, perPage, isLoading, search])
 
+
+
+
+  function handleSearch(e) {
+    e.preventDefault()
+     if (search !== e.target.form[1].value) { 
+       setIsloading(true)
+    }
+    setperPage(12)
+    setPage(1)
+    setSearch(e.target.form[1].value)
+     
   }
 
-  changePage = (e) => { 
-    let count = this.state.page
+  function changePage(e) {
+    let count = page
     
-    if (count === this.state.totalPages) {
+    if (count === totalPages) {
       alert('No se encuentran mas resultados')
 
     } else { 
       count++ 
-      let perpageUpdate = this.state.perPage + 12
-      this.setState({perPage: perpageUpdate, page: count, isLoading:true})
-
+      setperPage(perPage+12)
+      setPage(count)
+      setIsloading(true)
     }
    
   }
-
-  ImgClick = (e) => {
-    this.setState({imgModal: e.target.src, showModal:true})
     
+  function ImgClick(e) {
+    setImgModal(e.target.src)
+    setShowModal(true)
   }
-
-  HandleOverlayEsc = (e) => { 
     
-    if (!e.target.src) { 
-      this.setState({ showModal: false })
-
-    }
-   
-  }
-
-  handleonKeyDown = (e) => { 
+  function handleonKeyDown(e) {
     if (e.key === 'Escape') { 
-      this.setState({showModal:false})
-    } 
+        this.setState({showModal:false})
+      } 
   }
 
-
-  render() {
-    const { images, search, isLoading, showModal } = this.state
+  function HandleOverlayEsc(e) {
+    if (!e.target.src) {
+      setShowModal(false)
+    }
+  }
    
-    return (
-      <div className="App">
-        <Searchbar handleSearch={this.handleSearch}/>
+  
+  
+
+  return (
+    <div className="App">
+        <Searchbar handleSearch={handleSearch}/>
         
         {search && (
-          <ImageGallery images={images} ImgClick={this.ImgClick } />
+          <ImageGallery images={images} ImgClick={ImgClick } />
           
           )}
         {isLoading && <Audio
@@ -128,19 +122,18 @@ export default class App extends Component {
         />}
 
         {search && (
-          <Button changePage={ this.changePage} />
+          <Button changePage={ changePage} />
         )}
         {showModal &&
-          <Modal HandleOverlayEsc={this.HandleOverlayEsc}
-            handleonKeyDown={this.handleonKeyDown}>
-            <img src={this.state.imgModal} alt=""
-              onKeyDown={(e) => this.handleonKeyDown(e)}
+          <Modal HandleOverlayEsc={HandleOverlayEsc}
+            handleonKeyDown={handleonKeyDown}>
+            <img src={imgModal} alt=""
+              onKeyDown={(e) => handleonKeyDown(e)}
               tabIndex={-1}
               />
           </Modal>
         }
       
     </div>
-    )
-  }
+  )
 }

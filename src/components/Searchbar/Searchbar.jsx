@@ -1,11 +1,9 @@
 import styles from './Searchbar.module.css'
-import React, { Component } from 'react'
+import React from 'react'
 
-export default class Searchbar extends Component {
-  render() {
-    const { handleSearch} = this.props
-    return (
-      <header className={styles.searchbar }>
+export default function Searchbar({ handleSearch}) {
+  return (
+    <header className={styles.searchbar }>
       <form className={ styles.SearchForm}>
           <button 
             className={styles.SearchFormButton}
@@ -23,7 +21,6 @@ export default class Searchbar extends Component {
             
           />
         </form>
-    </header>  
-    )
-  }
+    </header>
+  )
 }
